@@ -20,3 +20,15 @@ table {
   font-style: normal;
   font-display: block;
 }
+
+.lsb {
+  background: url(/images/nav_logo229.png) 0 -261px repeat-x;
+  border: none;
+  color: #000;
+  cursor: pointer;
+  height: 30px;
+  margin: 0;
+  outline: 0;
+  font: 15px arial, sans-serif;
+  vertical-align: top;
+}

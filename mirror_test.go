@@ -21,6 +21,12 @@ func TestGetLinksFromHTML(t *testing.T) {
 	}{
 		{path: "/apple.jpg"},
 		{path: "/jquery.js"},
+		{path: "/images/logos/riotgames.png"},
+		{path: "/images/go-logo-white.svg"},
+	}
+
+	if len(links) != len(expected) {
+		t.Fatalf("does not match length expected:%s real:%s\n", expected, links)
 	}
 	for i, link := range links {
 		if link != expected[i].path {
@@ -36,6 +42,9 @@ func TestGetLinksFromHTML(t *testing.T) {
 		path string
 	}{
 		{path: "/favicon.ico"},
+	}
+	if len(links) != len(expected) {
+		t.Fatalf("does not match length expected:%s real:%s\n", expected, links)
 	}
 	for i, link := range links {
 		if link != expected[i].path {
@@ -62,6 +71,10 @@ func TestGetLinksFromCSS(t *testing.T) {
 		{path: "/assets/common/parts/fonts/icon.ttf"},
 		{path: "/assets/common/parts/fonts/icon.woff"},
 		{path: "/assets/common/parts/fonts/icon.svg"},
+		{path: "/images/nav_logo229.png"},
+	}
+	if len(links) != len(expected) {
+		t.Fatalf("does not match length expected:%s real:%s\n", expected, links)
 	}
 	for i, link := range links {
 		if link != expected[i].path {

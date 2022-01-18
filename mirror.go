@@ -66,7 +66,12 @@ func (c *Client) mirror(baseURL string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	linkCSS, err := c.getLinksFromCSS(bodyString)
+	if err != nil {
+		log.Fatal(err)
+	}
 	links = append(linkHref, linkSrc...)
+	links = append(links, linkCSS...)
 
 	r := regexp.MustCompile(`\.css$`)
 
@@ -209,18 +214,25 @@ func (c *Client) parseURL(inputURL string) (*url.URL, error) {
 }
 
 func (c *Client) getLinksFromHTML(html string, attr string) ([]string, error) {
-	reg := fmt.Sprintf("(?m)<(img|link|script).+%s=\"(/[^/].+?)\"", attr)
+	html = c.chop(html)
+	reg := fmt.Sprintf("(?m)<(img|link|script).+?%s=\"(/[^/][^>]+?)\"", attr)
 	r := regexp.MustCompile(reg)
 	results := r.FindAllStringSubmatch(html, -1)
 	var links []string
+	r = regexp.MustCompile(".+/$")
 	for _, result := range results {
-		u, _ := c.parseURL(result[2])
+		path := result[2]
+		u, _ := c.parseURL(path)
+		if r.MatchString(u.Path) {
+			continue
+		}
 		links = append(links, u.Path)
 	}
 	return links, nil
 }
 
 func (c *Client) getLinksFromCSS(css string) ([]string, error) {
+	css = c.chop(css)
 	r := regexp.MustCompile(`url\((/[^/].+?)\)`)
 	results := r.FindAllStringSubmatch(css, -1)
 	var links []string
@@ -229,4 +241,9 @@ func (c *Client) getLinksFromCSS(css string) ([]string, error) {
 		links = append(links, u.Path)
 	}
 	return links, nil
+}
+
+func (c *Client) chop(s string) string {
+	var r = regexp.MustCompile(`\r\n|\r|\n`) //throw panic if fail
+	return r.ReplaceAllString(s, "")
 }
