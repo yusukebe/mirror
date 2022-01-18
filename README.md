@@ -2,6 +2,14 @@
 
 `mirror` is command line tool for mirroring a web page.
 
+## Caution
+
+**Do not abuse**
+
+## Demo
+
+![Demo](https://user-images.githubusercontent.com/10682/149873709-354f664c-552e-4d54-b8d4-8a36325fa0c5.gif)
+
 ## Installation
 
 ```plain
