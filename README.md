@@ -13,6 +13,10 @@
 - Download all assets that emit when page is loaded.
 - Decode Gzip and Brotli encoding content.
 
+## DEMO
+
+![DEMO](https://user-images.githubusercontent.com/10682/149944322-677375e6-aa53-4ef1-80f4-b1b6d5e010c2.gif)
+
 ## Installation
 
 ```plain
