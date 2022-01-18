@@ -10,9 +10,12 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/andybalholm/brotli"
 	"github.com/go-rod/rod"
+	"github.com/go-rod/rod/lib/proto"
 )
 
 type Client struct {
@@ -24,12 +27,7 @@ type Client struct {
 
 func NewClient(param param) *Client {
 	client := &http.Client{
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
-		Transport: &http.Transport{
-			DisableCompression: true,
-		},
+		Timeout: 60 * time.Second,
 	}
 	return &Client{
 		outputDir:    param.outputDir,
@@ -65,15 +63,17 @@ func (c *Client) browse(baseUrl string) error {
 	defer router.MustStop()
 
 	base := fmt.Sprintf("%s://%s", url.Scheme, url.Hostname())
+	wg := &sync.WaitGroup{}
 
 	router.MustAdd(fmt.Sprintf("%s/*", base), func(ctx *rod.Hijack) {
+		wg.Add(1)
 		requestURL := ctx.Request.URL()
 
 		if c.userAgent != "" {
 			ctx.Request.Req().Header.Set("User-Agent", c.userAgent)
 		}
 
-		ctx.MustLoadResponse()
+		ctx.ContinueRequest(&proto.FetchContinueRequest{})
 
 		body, err := c.decodeContent(ctx.Response)
 		if err != nil {
@@ -88,15 +88,16 @@ func (c *Client) browse(baseUrl string) error {
 		}
 		err = c.saveFile(path, []byte(body))
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
 		}
 
 		c.printSaved(requestURL.String(), path)
+		wg.Done()
 	})
 
 	go router.Run()
 	browser.MustPage(url.String()).MustWaitLoad()
-
+	wg.Wait()
 	return nil
 }
 
