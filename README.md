@@ -4,11 +4,14 @@
 
 ## Caution
 
-**Do not abuse**
+**Do not abuse.**
 
-## Demo
+## Feature
 
-![Demo](https://user-images.githubusercontent.com/10682/149873709-354f664c-552e-4d54-b8d4-8a36325fa0c5.gif)
+- Using Headless Chrome.
+- Fetch HTML although rendered by JavaScript.
+- Download all assets that emit when page is loaded.
+- Decode Gzip and Brotli encoding content.
 
 ## Installation
 
