@@ -1,0 +1,22 @@
+blockquote:after,
+blockquote:before,
+q:after,
+q:before {
+  content: '';
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+@font-face {
+  font-family: icon;
+  src: url(/assets/common/parts/fonts/icon.ttf) format('truetype'),
+    url(/assets/common/parts/fonts/icon.woff) format('woff'),
+    url(/assets/common/parts/fonts/icon.svg#icon) format('svg');
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
