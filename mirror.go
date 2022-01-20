@@ -15,6 +15,7 @@ import (
 
 	"github.com/andybalholm/brotli"
 	"github.com/go-rod/rod"
+	"github.com/go-rod/rod/lib/launcher"
 )
 
 type Client struct {
@@ -54,7 +55,15 @@ func (c *Client) browse(baseUrl string) error {
 		log.Fatal(err)
 	}
 
-	browser := rod.New().MustConnect()
+	l, err := launcher.New().
+		Set("no-sandbox", "true").
+		Launch()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	browser := rod.New().ControlURL(l).MustConnect()
 
 	defer browser.MustClose()
 
