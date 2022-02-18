@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -83,6 +84,13 @@ func (c *Client) browse(baseUrl string) error {
 
 		ctx.MustLoadResponse()
 
+		r := regexp.MustCompile(`html`)
+		contentType := ctx.Response.Headers().Get("Content-Type")
+		if r.MatchString(contentType) {
+			wg.Done()
+			return
+		}
+
 		body, err := c.decodeContent(ctx.Response)
 		if err != nil {
 			log.Fatal(err)
@@ -94,6 +102,7 @@ func (c *Client) browse(baseUrl string) error {
 		} else {
 			path = fmt.Sprintf("%s%s", c.outputDir, requestURL.Path)
 		}
+
 		err = c.saveFile(path, []byte(body))
 		if err != nil {
 			fmt.Println(err)
@@ -104,7 +113,11 @@ func (c *Client) browse(baseUrl string) error {
 	})
 
 	go router.Run()
-	browser.MustPage(url.String()).MustWaitLoad()
+	page := browser.MustPage(url.String())
+	page.WaitLoad()
+	height := page.MustGetWindow().Height
+	// Scroll 100 times
+	page.Mouse.Scroll(0, float64(height), 100)
 	wg.Wait()
 	return nil
 }
