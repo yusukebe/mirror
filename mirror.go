@@ -9,7 +9,6 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -17,6 +16,7 @@ import (
 	"github.com/andybalholm/brotli"
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
+	"github.com/go-rod/rod/lib/proto"
 )
 
 type Client struct {
@@ -84,13 +84,6 @@ func (c *Client) browse(baseUrl string) error {
 
 		ctx.MustLoadResponse()
 
-		r := regexp.MustCompile(`html`)
-		contentType := ctx.Response.Headers().Get("Content-Type")
-		if r.MatchString(contentType) {
-			wg.Done()
-			return
-		}
-
 		body, err := c.decodeContent(ctx.Response)
 		if err != nil {
 			log.Fatal(err)
@@ -114,9 +107,15 @@ func (c *Client) browse(baseUrl string) error {
 
 	go router.Run()
 	page := browser.MustPage(url.String())
+
+	page.SetViewport(&proto.EmulationSetDeviceMetricsOverride{
+		Width: 800,
+	})
+
 	page.WaitLoad()
 	height := page.MustGetWindow().Height
 	// Scroll 100 times
+
 	page.Mouse.Scroll(0, float64(height), 100)
 	wg.Wait()
 	return nil
